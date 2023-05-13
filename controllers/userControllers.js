@@ -22,28 +22,28 @@ Post request json file structure
 const registerUser =async (req, res) => {
 
     //Write you code here
-        try{
-    const { name, email, password } = req.body
-    
-    const salt = await bcrypt.genSalt(10)
-    
-    const hashedPassword = await bcrypt.hash(password, salt)
-    
-    const newUser = new users({
-    name: name,
-    email: email,
-    password: hashedPassword
+     const name = req.body.name;
+    const email  = req.body.email;
+    const password = req.body.password;
+    const DOB = req.body.DOB;
+
+
+    // Generate a salt to be used for hashing
+    const saltRounds = 10;
+    const salt = bcrypt.genSaltSync(saltRounds);
+    const hashedPassword = bcrypt.hashSync(password, salt);
+    var newuser = {
+        "name":name,
+        "email":email,
+        "password": hashedPassword,
+        "DOB":DOB
+    };
+    users.create(newuser).then((user) => {
+        res.send(user._id);
     })
-    
-    await newUser.save()
-        
-        res.status(200).send(newUser._id)
-        
-    } catch (error) {
-        res.status(404).send(error.massage)
-    }
+    .catch((error) => {
+        res.status(404).send(error.message);
+    });
 }
-
-
 
 module.exports = { registerUser };
